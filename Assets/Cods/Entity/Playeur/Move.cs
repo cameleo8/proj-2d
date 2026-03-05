@@ -25,21 +25,25 @@ public class Move : MonoBehaviour
         }
         if (_run != null)
         {
-            if (_moveCoroutine == null)
-                _moveCoroutine = StartCoroutine(MoveCoroutine());
+            _run.action.started += Coursse;
         }
-        else
-        {
-            StopDeplacement();
-        }
+            
     }
 
     private void Deplacement(InputAction.CallbackContext ctx)
     {
         _deplacement = ctx.ReadValue<Vector2>().normalized;
 
-        if (_deplacement.magnitude > 0.1f){
-
+        if (_deplacement.magnitude > 0.1f)
+        {
+            if (_moveCoroutine == null)
+            {
+                _moveCoroutine = StartCoroutine(MoveCoroutine());
+            }
+        }
+        else
+        {
+            StopDeplacement();
         }
     }
 
@@ -57,22 +61,16 @@ public class Move : MonoBehaviour
         while (_deplacement.magnitude > 0.1f)
         {
             float speed = _running ? _speed_r : _speed_w;
-            transform.Translate(_deplacement.normalized * speed * Time.deltaTime);
-            yield return null; // attend la prochaine frame
+            transform.Translate(_deplacement * speed * Time.deltaTime);
+            yield return null;
         }
-        _moveCoroutine = null; // coroutine terminée
+        _moveCoroutine = null;
     }
 
 
 
     private void Coursse(InputAction.CallbackContext ctx)
     {
-        _running = !_running;
-    }
-
-
-    void Update()
-    {
-        
+        _running = ctx.ReadValueAsButton();
     }
 }
